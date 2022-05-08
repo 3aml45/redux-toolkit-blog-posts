@@ -1,33 +1,44 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { postAdded, addNewPost } from "./postsSlice";
+import { useNavigate, useParams } from "react-router-dom";
 import { selectAllUsers } from "../users/usersSlice";
-import { useNavigate } from "react-router-dom";
+import { selectPostById, updatePost } from "./postsSlice";
 
-export const AddPostForm = () => {
+export const EditPostForm = () => {
+  const { postId } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const post = useSelector((state) => selectPostById(state, Number(postId)));
   const users = useSelector(selectAllUsers);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [userId, setUserId] = useState("");
-  const [addRequestStatus, setAddRequestStatus] = useState("idle");
-
+  const [title, setTitle] = useState(post?.title);
+  const [content, setContent] = useState(post?.body);
+  const [userId, setUserId] = useState(post?.userId);
+  const [requestStatus, setRequestStatus] = useState("idle");
+  const dispatch = useDispatch();
+  if (!post) {
+    return (
+      <section>
+        <h2>Post Not Found!</h2>
+      </section>
+    );
+  }
   const canSave =
-    [title, content, userId].every(Boolean) && addRequestStatus === "idle";
+    [title, content, userId].every(Boolean) && requestStatus === "idle";
 
   const onSavePostClicked = () => {
     if (canSave) {
       try {
-        dispatch(addNewPost({ title, body: content, userId })).unwrap();
+        setRequestStatus("loading");
+        dispatch(
+          updatePost({ id: post.id, title, body: content, userId, reactions: post.reactions })
+        ).unwrap();
         setTitle("");
         setContent("");
         setUserId("");
-        navigate("/");
+        navigate(`/post/${postId}`);
       } catch (error) {
         console.error("Failed to save the post", error);
       } finally {
-        setAddRequestStatus("idle");
+        setRequestStatus("idle");
       }
     }
   };
@@ -37,10 +48,9 @@ export const AddPostForm = () => {
       {user.name}
     </option>
   ));
-
   return (
     <section>
-      <h2>Add a New Post</h2>
+      <h2>Edit Post</h2>
       <form>
         <label htmlFor="postTitle">Post Title:</label>
         <input
@@ -53,16 +63,16 @@ export const AddPostForm = () => {
         <label htmlFor="postAuthor">Author:</label>
         <select
           id="postAuthor"
-          value={userId}
+          defaultValue={userId}
           onChange={(e) => setUserId(e.target.value)}
         >
           <option value=""></option>
           {usersOptions}
         </select>
-        <label htmlFor="postTitle">Content:</label>
+        <label htmlFor="postContent">Content:</label>
         <textarea
-          id="postContent"
           name="postContent"
+          id="postContent"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />

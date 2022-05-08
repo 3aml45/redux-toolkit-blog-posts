@@ -33,7 +33,6 @@ export const PostsList = () => {
   }
   return (
     <section>
-      <h2>Posts List</h2>
       {content}
     </section>
   );
