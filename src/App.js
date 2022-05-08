@@ -1,10 +1,12 @@
-import "./App.css";
-import { Counter } from "./features/counter/Counter.jsx";
+import React from "react";
+import { AddPostForm } from "./features/posts/AddPostForm";
+import { PostsList } from "./features/posts/PostsList";
 
-function App() {
+const App = () => {
   return (
     <main className="App">
-      <Counter />
+      <AddPostForm />
+      <PostsList />      
     </main>
   );
 }
