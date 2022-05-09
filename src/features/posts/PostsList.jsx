@@ -9,15 +9,14 @@ import {
 } from "./postsSlice";
 
 export const PostsList = () => {
-  const dispatch = useDispatch();
   const posts = useSelector(selectAllPosts);
   const postsStatus = useSelector(getPostsStatus);
   const error = useSelector(getPostsError);
-  useEffect(() => {
-    if (postsStatus === "idle") {
-      dispatch(fetchPosts());
-    }
-  }, [postsStatus, dispatch]); // those are defined inside of the component
+  // useEffect(() => {
+  //   if (postsStatus === "idle") {
+  //     dispatch(fetchPosts());
+  //   }
+  // }, [postsStatus, dispatch]); // those are defined inside of the component
   let content;
   if (postsStatus === "loading") {
     content = <p>"Loading..."</p>;
